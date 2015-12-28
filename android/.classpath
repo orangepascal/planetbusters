@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
+	<classpathentry exported="true" kind="src" path="/Planet Busters-core"/>
+	<classpathentry exported="true" kind="lib" path="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-android/1.7.1/454871d4783564f17959bf9247660e7f56ecc4ab/gdx-backend-android-1.7.1.jar" sourcepath="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-android/1.7.1/d15c29999a6dfdb13d56e8379b8675ab71a2b86a/gdx-backend-android-1.7.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-controllers/1.7.1/74f9953d61110e1b80a01a6bd6dcd057cdfe0a91/gdx-controllers-1.7.1.jar" sourcepath="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-controllers/1.7.1/1b07a9a44f722381da9bf3c7ef0d54b9c93b17e2/gdx-controllers-1.7.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-controllers-android/1.7.1/28d5514b1b968a056e37239d1bceb1800a453f3e/gdx-controllers-android-1.7.1.jar" sourcepath="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-controllers-android/1.7.1/de97a929e2a2ea49b2a87d9a981a68c893ee8969/gdx-controllers-android-1.7.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.7.1/2179cc613447c297623a4a6d2ba6692c3aaff804/gdx-1.7.1.jar" sourcepath="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.7.1/a1fd092a4cdeb029ddb205805143a26545de1e6b/gdx-1.7.1-sources.jar"/>
+	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
+	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="output" path="bin/classes"/>
+</classpath>

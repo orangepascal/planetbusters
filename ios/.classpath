@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.robovm.eclipse.ROBOVM_CONTAINER"/>
+	<classpathentry kind="con" path="org.robovm.eclipse.ROBOVM_COCOA_TOUCH_CONTAINER"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="src" path="/Planet Busters-core"/>
+	<classpathentry exported="true" kind="lib" path="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/org.robovm/robovm-rt/1.9.0/411c6f6febf857a6ff13e3a9012d4477941e8037/robovm-rt-1.9.0.jar" sourcepath="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/org.robovm/robovm-rt/1.9.0/bb289b79c773a868a43ebab2923787a3827b94dc/robovm-rt-1.9.0-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/org.robovm/robovm-cocoatouch/1.9.0/778a1cc990670e2bd4cff9058a865b411f6898f5/robovm-cocoatouch-1.9.0.jar" sourcepath="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/org.robovm/robovm-cocoatouch/1.9.0/4f9be8c45c69dd08dfda06544d3fb36294741b5/robovm-cocoatouch-1.9.0-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-robovm/1.7.1/26b07fd6a45d69315908bb8468baf56690354004/gdx-backend-robovm-1.7.1.jar" sourcepath="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-backend-robovm/1.7.1/c6ab75c3778efee739963f4e8202ab4e304bfd2e/gdx-backend-robovm-1.7.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx-platform/1.7.1/1c54f9d20495529c63c914bcd19779fd71dfc192/gdx-platform-1.7.1-natives-ios.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.7.1/2179cc613447c297623a4a6d2ba6692c3aaff804/gdx-1.7.1.jar" sourcepath="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/com.badlogicgames.gdx/gdx/1.7.1/a1fd092a4cdeb029ddb205805143a26545de1e6b/gdx-1.7.1-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/org.robovm/robovm-objc/1.9.0/df860e4d0e0f6102cb2e15f026c95a38ac842138/robovm-objc-1.9.0.jar" sourcepath="/Users/pascalbestebroer/.gradle/caches/modules-2/files-2.1/org.robovm/robovm-objc/1.9.0/82b29b1cfbd557b94f9345b361ba0e6108d50a18/robovm-objc-1.9.0-sources.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
