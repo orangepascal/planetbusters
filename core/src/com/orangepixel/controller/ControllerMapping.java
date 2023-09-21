@@ -1,7 +1,5 @@
 package com.orangepixel.controller;
 
-import com.badlogic.gdx.controllers.PovDirection;
-
 public class ControllerMapping {
 	public String id="generic";
 	  public int BUTTON_A = 0;
@@ -14,11 +12,6 @@ public class ControllerMapping {
 	  public int BUTTON_START = 7;
 	  public int BUTTON_LS = 8; //Left Stick pressed down
 	  public int BUTTON_RS = 9; //Right Stick pressed down
-	  
-	  public PovDirection DPAD_UP = PovDirection.north;
-	  public PovDirection DPAD_DOWN = PovDirection.south;
-	  public PovDirection DPAD_LEFT = PovDirection.west;
-	  public PovDirection DPAD_RIGHT = PovDirection.east;
 	  
 	  public int BUTTON_DPAD_UP=0;
 	  public int BUTTON_DPAD_DOWN=1;

@@ -12,8 +12,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
-import com.badlogic.gdx.controllers.PovDirection;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -308,7 +306,12 @@ public class ArcadeCanvas implements ApplicationListener {
 				}
 				return false;
 			}
-			
+
+			@Override
+			public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+				return touchUp(screenX, screenY, pointer, button);
+			}
+
 			@Override
 			public boolean touchDragged(int screenX, int screenY, int pointer) {
 				controller1.isTouchscreen();
@@ -321,10 +324,10 @@ public class ArcadeCanvas implements ApplicationListener {
 					mTouchY[pointer]=(int)(touchY);
 				}
 				
-				if (isDesktop) {
-					controller1.isMouse();
-					processMouse(screenX,screenY);
-				}
+//				if (isDesktop) {
+//					controller1.isMouse();
+//					processMouse(screenX,screenY);
+//				}
 				
 				return false;
 			}
@@ -342,7 +345,7 @@ public class ArcadeCanvas implements ApplicationListener {
 				}
 			
 				if (isDesktop) {
-					controller1.isMouse();
+//					controller1.isMouse();
 					if (button==Input.Buttons.LEFT) {
 						controller1.BUTTON_X=true;
 					}
@@ -356,21 +359,11 @@ public class ArcadeCanvas implements ApplicationListener {
 						controller1.BUTTON_A=true;
 					}
 					
-					processMouse(screenX,screenY);
+//					processMouse(screenX,screenY);
 				}
 				return false;
 			}
-			
-			@Override
-			public boolean scrolled(int amount) {
-				controller1.isMouse();
-				controller1.scrollWheelUp=false;
-				controller1.scrollWheelDown=false;
-				if (amount<0) controller1.scrollWheelUp=true;
-				else if (amount>0) controller1.scrollWheelDown=true;
-				return false;
-			}
-			
+
 			@Override
 			public boolean mouseMoved(int screenX, int screenY) {
 				controller1.isMouse();
@@ -379,7 +372,17 @@ public class ArcadeCanvas implements ApplicationListener {
 				processMouse(screenX,screenY);
 				return false;
 			}
-			
+
+			@Override
+			public boolean scrolled(float amountX, float amountY) {
+				controller1.isMouse();
+				controller1.scrollWheelUp=false;
+				controller1.scrollWheelDown=false;
+				if (amountY<0) controller1.scrollWheelUp=true;
+				else if (amountY>0) controller1.scrollWheelDown=true;
+				return false;
+			}
+
 			@Override
 			public boolean keyUp(int keycode) {
 				lastKeyCode=-1;
@@ -599,549 +602,491 @@ public class ArcadeCanvas implements ApplicationListener {
 //		firstdevice=-1;
 	
 		
-		for(Controller controller: Controllers.getControllers()) {
-			// detect controller if we can
-			if (!controller.getName().isEmpty()) {
-				if (isAndroid) {
-					pad=new GSGamePadAndroid();
-				} else if (controller.getName().toLowerCase().contains("xbox")
-						|| controller.getName().toLowerCase().contains("x-box")
-						|| controller.getName().toLowerCase().contains("gamepad f")) {	// "gamepad fxxx" are logitech gamepads
-					if (IS_MAC) pad=new XBoxOSX();
-					else if (IS_LINUX) {
-						if (controller.getName().toLowerCase().contains("wireless receiver")) {
-							pad=new XBoxLinuxAlt();
-						} else {
-							pad=new XBoxLinux();
-						}
-					} else pad=new XBox();
-				} else if (controller.getName().toLowerCase().contains("playstation")) {
-					// PS3 on windows 8 is detected, but won't register
-					pad=new PS3();
-				} else if (controller.getName().contains("Wireless Controller")) {
-					if (IS_MAC) pad=new PS4OSX();
-					else pad=new PS4();
-				} else if (controller.getName().contains("Pro Ex")) {
-					pad=new ProExPowerA();
-				} else if (!controller.getName().toLowerCase().contains("flight")) {
-					Gdx.app.log("opdebug", "Unknown controller: "+controller.getName() + " hash:"+controller.hashCode());
-					if (controllersAllowUnknown) {
-						// made sure it's not a flight stick or anything
-						// now use generic mapping, and hope it works (basically this is XBox mapping)
-						pad=new ControllerMapping();
-					}
-				}
-			}
-			
-			
-			if (pad!=null) {
-//				Gdx.app.log("opdebug","controller mapped:"+pad.id);
-
-				if (controller1.hashcode<0) {
-					controller1.hashcode=controller.hashCode();
-					controller1.mapping=pad;
-					controller1.name=controller.getName();
-				} else {
-					controller2.hashcode=controller.hashCode();
-					controller2.mapping=pad;
-					controller2.name=controller.getName();
-				}
-				controllersFound++;
-				controller.addListener(new ControllerListener() {
-					
-					public boolean ySliderMoved(Controller arg0, int arg1, boolean arg2) { return false; }
-					public boolean xSliderMoved(Controller arg0, int arg1, boolean arg2) { return false; }
-					public boolean povMoved(Controller arg0, int arg1, PovDirection arg2) {
-						if (arg0==null || controller1==null) return false;
-						
-
-						if (arg0.hashCode()==controller1.hashcode && controller1.mapping!=null) {
-							if (arg2==controller1.mapping.DPAD_UP) {
-								controller1.upPressed=true;
-								controller1.DPAD_UP=true;
-								controller1.BUTTON_DPADUp=true;
-							} else if (controller1.DPAD_UP) {
-								controller1.DPAD_UP=false;
-								controller1.upPressed=false;
-								controller1.upLocked=false;
-								controller1.BUTTON_DPADUp=false;
-								controller1.BUTTON_DPADUpLocked=false;
-							}
-
-							if (arg2==controller1.mapping.DPAD_DOWN) {
-								controller1.DPAD_DOWN=true;
-								controller1.downPressed=true;
-								controller1.BUTTON_DPADDown=true;
-							} else if (controller1.DPAD_DOWN) {
-								controller1.DPAD_DOWN=false;
-								controller1.downPressed=false;
-								controller1.downLocked=false;
-								controller1.BUTTON_DPADDown=false;
-								controller1.BUTTON_DPADDownLocked=false;
-							}
-
-							if (arg2==controller1.mapping.DPAD_RIGHT) {
-								controller1.DPAD_RIGHT=true;
-								controller1.rightPressed=true;
-								controller1.BUTTON_DPADRight=true;
-							} else if (controller1.DPAD_RIGHT) {
-								controller1.DPAD_RIGHT=false;
-								controller1.rightPressed=false;
-								controller1.rightLocked=false;
-								controller1.BUTTON_DPADRight=false;
-								controller1.BUTTON_DPADRightLocked=false;
-							}
-							
-							if (arg2==controller1.mapping.DPAD_LEFT) {
-								controller1.DPAD_LEFT=true;
-								controller1.leftPressed=true;
-								controller1.BUTTON_DPADLeft=true;
-							} else if (controller1.DPAD_LEFT) {
-								controller1.DPAD_LEFT=false;
-								controller1.leftPressed=false;
-								controller1.leftLocked=false;
-								controller1.BUTTON_DPADLeft=false;
-								controller1.BUTTON_DPADLeftLocked=false;
-							}
-							
-						}
-						
-						return false; 
-						
-					}
-					public void disconnected(Controller arg0) {}
-					public void connected(Controller arg0) {}
-					public boolean accelerometerMoved(Controller arg0, int arg1, Vector3 arg2) { return false; }
-					
-					public boolean buttonUp(Controller arg0, int arg1) {
-//						last_button=-999;
-//						pl2_last_button=-999;
-						if (arg0==null || controller1==null) return false;
-						
-						if (arg0.hashCode()==controller1.hashcode && controller1.mapping!=null) {
-//							Gdx.app.log("opdebug","buttonup:"+arg1);
-							
-							if (arg1==controller1.mapping.BUTTON_X) { // button_a) {
-								controller1.BUTTON_X=false;
-								controller1.BUTTON_Xlocked=false;
-								return true;
-							}
-							if (arg1==controller1.mapping.BUTTON_A) { //button_b) {
-								controller1.BUTTON_A=false;
-								controller1.BUTTON_Alocked=false;
-								return true;
-							}
-							if (arg1==controller1.mapping.BUTTON_B) { // button_c) {
-								controller1.BUTTON_B=false;
-								controller1.BUTTON_Blocked=false;
-								controller1.backPressed=false;
-								controller1.backLocked=false;
-								return true;
-							}	
-							
-							if (arg1==controller1.mapping.BUTTON_Y) {
-								controller1.BUTTON_Y=false;
-								controller1.BUTTON_Ylocked=false;
-								return true;
-							}
-							
-							if (arg1==controller1.mapping.BUTTON_LB) {
-								controller1.BUTTON_LB=false;
-								controller1.BUTTON_LBlocked=false;
-								return true;
-							}
-
-							if (arg1==controller1.mapping.BUTTON_RB) {
-								controller1.BUTTON_RB=false;
-								controller1.BUTTON_RBlocked=false;
-								return true;
-							}
-							if (arg1==controller1.mapping.BUTTON_START) { //button_b) {
-								controller1.BUTTON_SPECIAL2=false;
-								controller1.BUTTON_SPECIAL2locked=false;
-								return true;
-							}
-							
-
-							if (arg1==controller1.mapping.BUTTON_DPAD_UP) {
-								controller1.upPressed=false;
-								controller1.upLocked=false;
-								controller1.BUTTON_DPADUp=false;
-								controller1.BUTTON_DPADUpLocked=false;
-								return true;
-							}
-
-							if (arg1==controller1.mapping.BUTTON_DPAD_DOWN) {
-								controller1.downPressed=false;
-								controller1.downLocked=false;
-								controller1.BUTTON_DPADDown=false;
-								controller1.BUTTON_DPADDownLocked=false;
-								
-								return true;
-							}
-							
-							if (arg1==controller1.mapping.BUTTON_DPAD_RIGHT) {
-								controller1.rightPressed=false;
-								controller1.rightLocked=false;
-								controller1.BUTTON_DPADRight=false;
-								controller1.BUTTON_DPADRightLocked=false;
-								return true;
-							}
-							
-							if (arg1==controller1.mapping.BUTTON_DPAD_LEFT) {
-								controller1.leftPressed=true;
-								controller1.leftLocked=false;
-								controller1.BUTTON_DPADLeft=false;
-								controller1.BUTTON_DPADLeftLocked=false;
-								return true;
-							}				
-									
-						} else if (controller2.mapping!=null) {
-							if (arg1==controller2.mapping.BUTTON_X) {
-								controller2.BUTTON_X=false;
-								controller2.BUTTON_Xlocked=false;
-								return true;
-							}
-							if (arg1==controller2.mapping.BUTTON_A) {
-								controller2.BUTTON_A=false;
-								controller2.BUTTON_Alocked=false;
-								return true;
-							}
-							if (arg1==controller2.mapping.BUTTON_START) { //button_b) {
-								controller2.BUTTON_SPECIAL2=false;
-								controller2.BUTTON_SPECIAL2locked=false;
-								return true;
-							}
-							
-							if (arg1==controller2.mapping.BUTTON_Y) {
-								controller2.BUTTON_Y=false;
-								controller2.BUTTON_Ylocked=false;
-								return true;
-							}
-							if (arg1==controller2.mapping.BUTTON_B) {
-								controller2.BUTTON_B=false;
-								controller1.BUTTON_Blocked=false;
-								controller2.backPressed=false;
-								controller2.backLocked=false;
-								return true;
-							}			
-							
-							if (arg1==controller2.mapping.BUTTON_LB) {
-								controller2.BUTTON_LB=false;
-								controller2.BUTTON_LBlocked=false;
-								return true;
-							}
-
-							if (arg1==controller2.mapping.BUTTON_RB) {
-								controller2.BUTTON_RB=false;
-								controller2.BUTTON_RBlocked=false;
-								return true;
-							}							
-
-							if (arg1==controller2.mapping.BUTTON_DPAD_UP) {
-								controller2.upPressed=false;
-								controller2.upLocked=false;
-								controller2.BUTTON_DPADUp=false;
-								controller2.BUTTON_DPADUpLocked=false;
-								return true;
-							}
-
-							if (arg1==controller2.mapping.BUTTON_DPAD_DOWN) {
-								controller2.downPressed=false;
-								controller2.downLocked=false;
-								controller2.BUTTON_DPADDown=false;
-								controller2.BUTTON_DPADDownLocked=false;
-								return true;
-							}
-						
-							if (arg1==controller2.mapping.BUTTON_DPAD_RIGHT) {
-								controller2.rightPressed=false;
-								controller2.rightLocked=false;
-								controller2.BUTTON_DPADRight=false;
-								controller2.BUTTON_DPADRightLocked=false;
-								return true;
-							}
-							
-							if (arg1==controller2.mapping.BUTTON_DPAD_LEFT) {
-								controller2.leftPressed=true;
-								controller2.leftLocked=false;
-								controller2.BUTTON_DPADLeft=false;
-								controller2.BUTTON_DPADLeftLocked=false;
-								return true;
-							}		
-
-						}
-						return false;
-					}
-					
-					@Override
-					public boolean buttonDown(Controller arg0, int arg1) {
-						if (arg0==null || controller1==null) return false;
-						
-						controller1.isGamepad();
-						
-						if (arg0.hashCode()==controller1.hashcode && controller1.mapping!=null) {
-//							Gdx.app.log("opdebug","buttondown:"+arg1);
-
-//							last_button=arg1;
-							
-							if (arg1==controller1.mapping.BUTTON_X) {
-								controller1.BUTTON_X=true;
-								return true;
-							}
-							if (arg1==controller1.mapping.BUTTON_A) {
-								controller1.BUTTON_A=true;
-								return true;
-							}
-							if (arg1==controller1.mapping.BUTTON_B) {
-								controller1.BUTTON_B=true;
-								controller1.backPressed=true;
-								return true;
-							}
-							if (arg1==controller1.mapping.BUTTON_START) { //button_b) {
-								controller1.BUTTON_SPECIAL2=true;
-								return true;
-							}
-							
-							
-							if (arg1==controller1.mapping.BUTTON_Y) {
-								controller1.BUTTON_Y=true;
-								return true;
-							}
-							if (arg1==controller1.mapping.BUTTON_LB) {
-								controller1.BUTTON_LB=true;
-								return true;
-							}
-							if (arg1==controller1.mapping.BUTTON_RB) {
-								controller1.BUTTON_RB=true;
-								return true;
-							}
-							
-
-							if (arg1==controller1.mapping.BUTTON_DPAD_UP) {
-								controller1.upPressed=true;
-								controller1.BUTTON_DPADUp=true;
-								return true;
-							}
-
-							if (arg1==controller1.mapping.BUTTON_DPAD_DOWN) {
-								controller1.downPressed=true;
-								controller1.BUTTON_DPADDown=true;
-								return true;
-							}
-							
-							if (arg1==controller1.mapping.BUTTON_DPAD_RIGHT) {
-								controller1.rightPressed=true;
-								controller1.BUTTON_DPADRight=true;
-								return true;
-							}
-							
-							if (arg1==controller1.mapping.BUTTON_DPAD_LEFT) {
-								controller1.leftPressed=true;
-								controller1.BUTTON_DPADLeft=true;
-								return true;
-							}
-
-						} else if (controller2.mapping!=null){
-//							pl2_last_button=arg1;
-							
-							if (arg1==controller2.mapping.BUTTON_X) {
-								controller2.BUTTON_X=true;
-								return true;
-							}
-							if (arg1==controller2.mapping.BUTTON_A) {
-								controller2.BUTTON_A=true;
-								return true;
-							}
-							if (arg1==controller2.mapping.BUTTON_B) {
-								controller2.BUTTON_B=true;
-								controller2.backPressed=true;
-								return true;
-							}	
-							if (arg1==controller2.mapping.BUTTON_Y) {
-								controller2.BUTTON_Y=true;
-								return true;
-							}
-							if (arg1==controller2.mapping.BUTTON_LB) {
-								controller2.BUTTON_LB=true;
-								return true;
-							}
-							if (arg1==controller2.mapping.BUTTON_RB) {
-								controller2.BUTTON_RB=true;
-								return true;
-							}							
-							
-							if (arg1==controller2.mapping.BUTTON_DPAD_UP) {
-								controller2.upPressed=true;
-								controller2.BUTTON_DPADUp=true;
-								return true;
-							}
-
-							if (arg1==controller2.mapping.BUTTON_DPAD_DOWN) {
-								controller2.downPressed=true;
-								controller2.BUTTON_DPADDown=true;
-								return true;
-							}
-							
-							if (arg1==controller2.mapping.BUTTON_DPAD_RIGHT) {
-								controller2.rightPressed=true;
-								controller2.BUTTON_DPADRight=true;
-								return true;
-							}
-							
-							if (arg1==controller2.mapping.BUTTON_DPAD_LEFT) {
-								controller2.leftPressed=true;
-								controller1.BUTTON_DPADLeft=true;
-								return true;
-							}							
-						}
-						
-						return false;
-					}
-					
-					@Override
-					public boolean axisMoved(Controller arg0, int arg1, float arg2) {
-						if (arg0==null || controller1==null) return false;
-						
-						
-						
-						arg2=arg2*128;
-
-						if (arg0.hashCode()==controller1.hashcode && controller1.mapping!=null) {
-
-							if (arg1==controller1.mapping.AXIS_LX) {
-								if (arg2>-25 && arg2<25) {
-									controller1.AXIS_LX=0;
-								} else {
-									controller1.AXIS_LX=(int)arg2;
-									controller1.isGamepad();
-								}
-								
-								
-								if (controller1.mapping.reverseXAxis) controller1.AXIS_LX=-controller1.AXIS_LX;
-								// also handle dpad stuff
-								if (arg2<-64) controller1.leftPressed=true;
-								else {
-									controller1.leftPressed=false;
-									controller1.leftLocked=false;
-								}
-								
-								if (arg2>64) controller1.rightPressed=true;
-								else {
-									controller1.rightPressed=false;
-									controller1.rightLocked=false;
-								}
-								
-								
-								return true;
-								
-							} else if (arg1==controller1.mapping.AXIS_LY) {
-								if (arg2>-25 && arg2<25) controller1.AXIS_LY=0;
-								else {
-									controller1.AXIS_LY=(int)arg2;
-									controller1.isGamepad();
-								}
-								
-								if (controller1.mapping.reverseYAxis) controller1.AXIS_LY=-controller1.AXIS_LY;
-								if (arg2<-64) controller1.upPressed=true;
-								else {
-									controller1.upPressed=false;
-									controller1.upLocked=false;
-								}
-								
-								
-								if (arg2>64) controller1.downPressed=true;
-								else {
-									controller1.downPressed=false;
-									controller1.downLocked=false;
-								}
-								
-								return true;
-							} else if (arg1==controller1.mapping.AXIS_RX) {
-								if (arg2>-25 && arg2<25) controller1.AXIS_RX=0;
-								else {
-									controller1.AXIS_RX=(int)arg2;
-									controller1.isGamepad();
-								}
-								if (controller1.mapping.reverseXAxis) controller1.AXIS_RX=-controller1.AXIS_RX;
-								return true;
-								
-							} else if (arg1==controller1.mapping.AXIS_RY) {
-								if (arg2>-25 && arg2<25) controller1.AXIS_RY=0;
-								else {
-									controller1.AXIS_RY=(int)arg2;
-									controller1.isGamepad();
-								}
-								
-								if (controller1.mapping.reverseYAxis) controller1.AXIS_RX=-controller1.AXIS_RX;
-								return true;
-							}
-						} else if (controller2.mapping!=null) {
-							// controller 2
-							if (arg1==controller2.mapping.AXIS_LX) {
-								if (arg2>-25 && arg2<25) controller2.AXIS_LX=0;
-								else {
-									controller2.AXIS_LX=(int)arg2;
-									controller2.isGamepad();
-								}
-								if (controller2.mapping.reverseXAxis) controller2.AXIS_LX=-controller2.AXIS_LX; 
-								
-								if (arg2<-64) controller2.leftPressed=true;
-								else {
-									controller2.leftPressed=false;
-									controller2.leftLocked=false;
-								}
-								
-								if (arg2>64) controller2.rightPressed=true;
-								else {
-									controller2.rightPressed=false;
-									controller2.rightLocked=false;
-								}
-								
-								return true;
-								
-							} else if (arg1==controller2.mapping.AXIS_LY) {
-								if (arg2>-25 && arg2<25) controller2.AXIS_LY=0;
-								else {
-									controller2.AXIS_LY=(int)arg2;
-									controller2.isGamepad();
-								}
-								if (controller2.mapping.reverseYAxis) controller2.AXIS_LY=-controller2.AXIS_LY;
-
-								if (arg2<-64) controller2.upPressed=true;
-								else {
-									controller2.upPressed=false;
-									controller2.upLocked=false;
-								}
-								
-								if (arg2>64) controller2.downPressed=true;
-								else {
-									controller2.downPressed=false;
-									controller2.downLocked=false;
-								}
-								return true;
-							} else if (arg1==controller2.mapping.AXIS_RX) {
-								if (arg2>-25 && arg2<25) controller2.AXIS_RX=0;
-								else controller2.AXIS_RX=(int)arg2;
-								
-								if (controller2.mapping.reverseXAxis) controller2.AXIS_RX=-controller2.AXIS_RX;
-								return true;
-								
-							} else if (arg1==controller2.mapping.AXIS_RY) {
-								if (arg2>-25 && arg2<25) controller2.AXIS_RY=0;
-								else controller2.AXIS_RY=(int)arg2;
-								
-								if (controller2.mapping.reverseYAxis) controller2.AXIS_RY=-controller2.AXIS_RY;
-								return true;
-							}
-							
-						}
-						return false;
-					}
-					
-				});
-			}
-		}
+//		for(Controller controller: Controllers.getControllers()) {
+//			// detect controller if we can
+//			if (!controller.getName().isEmpty()) {
+//				if (isAndroid) {
+//					pad=new GSGamePadAndroid();
+//				} else if (controller.getName().toLowerCase().contains("xbox")
+//						|| controller.getName().toLowerCase().contains("x-box")
+//						|| controller.getName().toLowerCase().contains("gamepad f")) {	// "gamepad fxxx" are logitech gamepads
+//					if (IS_MAC) pad=new XBoxOSX();
+//					else if (IS_LINUX) {
+//						if (controller.getName().toLowerCase().contains("wireless receiver")) {
+//							pad=new XBoxLinuxAlt();
+//						} else {
+//							pad=new XBoxLinux();
+//						}
+//					} else pad=new XBox();
+//				} else if (controller.getName().toLowerCase().contains("playstation")) {
+//					// PS3 on windows 8 is detected, but won't register
+//					pad=new PS3();
+//				} else if (controller.getName().contains("Wireless Controller")) {
+//					if (IS_MAC) pad=new PS4OSX();
+//					else pad=new PS4();
+//				} else if (controller.getName().contains("Pro Ex")) {
+//					pad=new ProExPowerA();
+//				} else if (!controller.getName().toLowerCase().contains("flight")) {
+//					Gdx.app.log("opdebug", "Unknown controller: "+controller.getName() + " hash:"+controller.hashCode());
+//					if (controllersAllowUnknown) {
+//						// made sure it's not a flight stick or anything
+//						// now use generic mapping, and hope it works (basically this is XBox mapping)
+//						pad=new ControllerMapping();
+//					}
+//				}
+//			}
+//
+//
+//			if (pad!=null) {
+////				Gdx.app.log("opdebug","controller mapped:"+pad.id);
+//
+//				if (controller1.hashcode<0) {
+//					controller1.hashcode=controller.hashCode();
+//					controller1.mapping=pad;
+//					controller1.name=controller.getName();
+//				} else {
+//					controller2.hashcode=controller.hashCode();
+//					controller2.mapping=pad;
+//					controller2.name=controller.getName();
+//				}
+//				controllersFound++;
+//				controller.addListener(new ControllerListener() {
+//
+//					public boolean ySliderMoved(Controller arg0, int arg1, boolean arg2) { return false; }
+//					public boolean xSliderMoved(Controller arg0, int arg1, boolean arg2) { return false; }
+//					public void disconnected(Controller arg0) {}
+//					public void connected(Controller arg0) {}
+//					public boolean accelerometerMoved(Controller arg0, int arg1, Vector3 arg2) { return false; }
+//
+//					public boolean buttonUp(Controller arg0, int arg1) {
+////						last_button=-999;
+////						pl2_last_button=-999;
+//						if (arg0==null || controller1==null) return false;
+//
+//						if (arg0.hashCode()==controller1.hashcode && controller1.mapping!=null) {
+////							Gdx.app.log("opdebug","buttonup:"+arg1);
+//
+//							if (arg1==controller1.mapping.BUTTON_X) { // button_a) {
+//								controller1.BUTTON_X=false;
+//								controller1.BUTTON_Xlocked=false;
+//								return true;
+//							}
+//							if (arg1==controller1.mapping.BUTTON_A) { //button_b) {
+//								controller1.BUTTON_A=false;
+//								controller1.BUTTON_Alocked=false;
+//								return true;
+//							}
+//							if (arg1==controller1.mapping.BUTTON_B) { // button_c) {
+//								controller1.BUTTON_B=false;
+//								controller1.BUTTON_Blocked=false;
+//								controller1.backPressed=false;
+//								controller1.backLocked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller1.mapping.BUTTON_Y) {
+//								controller1.BUTTON_Y=false;
+//								controller1.BUTTON_Ylocked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller1.mapping.BUTTON_LB) {
+//								controller1.BUTTON_LB=false;
+//								controller1.BUTTON_LBlocked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller1.mapping.BUTTON_RB) {
+//								controller1.BUTTON_RB=false;
+//								controller1.BUTTON_RBlocked=false;
+//								return true;
+//							}
+//							if (arg1==controller1.mapping.BUTTON_START) { //button_b) {
+//								controller1.BUTTON_SPECIAL2=false;
+//								controller1.BUTTON_SPECIAL2locked=false;
+//								return true;
+//							}
+//
+//
+//							if (arg1==controller1.mapping.BUTTON_DPAD_UP) {
+//								controller1.upPressed=false;
+//								controller1.upLocked=false;
+//								controller1.BUTTON_DPADUp=false;
+//								controller1.BUTTON_DPADUpLocked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller1.mapping.BUTTON_DPAD_DOWN) {
+//								controller1.downPressed=false;
+//								controller1.downLocked=false;
+//								controller1.BUTTON_DPADDown=false;
+//								controller1.BUTTON_DPADDownLocked=false;
+//
+//								return true;
+//							}
+//
+//							if (arg1==controller1.mapping.BUTTON_DPAD_RIGHT) {
+//								controller1.rightPressed=false;
+//								controller1.rightLocked=false;
+//								controller1.BUTTON_DPADRight=false;
+//								controller1.BUTTON_DPADRightLocked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller1.mapping.BUTTON_DPAD_LEFT) {
+//								controller1.leftPressed=true;
+//								controller1.leftLocked=false;
+//								controller1.BUTTON_DPADLeft=false;
+//								controller1.BUTTON_DPADLeftLocked=false;
+//								return true;
+//							}
+//
+//						} else if (controller2.mapping!=null) {
+//							if (arg1==controller2.mapping.BUTTON_X) {
+//								controller2.BUTTON_X=false;
+//								controller2.BUTTON_Xlocked=false;
+//								return true;
+//							}
+//							if (arg1==controller2.mapping.BUTTON_A) {
+//								controller2.BUTTON_A=false;
+//								controller2.BUTTON_Alocked=false;
+//								return true;
+//							}
+//							if (arg1==controller2.mapping.BUTTON_START) { //button_b) {
+//								controller2.BUTTON_SPECIAL2=false;
+//								controller2.BUTTON_SPECIAL2locked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller2.mapping.BUTTON_Y) {
+//								controller2.BUTTON_Y=false;
+//								controller2.BUTTON_Ylocked=false;
+//								return true;
+//							}
+//							if (arg1==controller2.mapping.BUTTON_B) {
+//								controller2.BUTTON_B=false;
+//								controller1.BUTTON_Blocked=false;
+//								controller2.backPressed=false;
+//								controller2.backLocked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller2.mapping.BUTTON_LB) {
+//								controller2.BUTTON_LB=false;
+//								controller2.BUTTON_LBlocked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller2.mapping.BUTTON_RB) {
+//								controller2.BUTTON_RB=false;
+//								controller2.BUTTON_RBlocked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller2.mapping.BUTTON_DPAD_UP) {
+//								controller2.upPressed=false;
+//								controller2.upLocked=false;
+//								controller2.BUTTON_DPADUp=false;
+//								controller2.BUTTON_DPADUpLocked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller2.mapping.BUTTON_DPAD_DOWN) {
+//								controller2.downPressed=false;
+//								controller2.downLocked=false;
+//								controller2.BUTTON_DPADDown=false;
+//								controller2.BUTTON_DPADDownLocked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller2.mapping.BUTTON_DPAD_RIGHT) {
+//								controller2.rightPressed=false;
+//								controller2.rightLocked=false;
+//								controller2.BUTTON_DPADRight=false;
+//								controller2.BUTTON_DPADRightLocked=false;
+//								return true;
+//							}
+//
+//							if (arg1==controller2.mapping.BUTTON_DPAD_LEFT) {
+//								controller2.leftPressed=true;
+//								controller2.leftLocked=false;
+//								controller2.BUTTON_DPADLeft=false;
+//								controller2.BUTTON_DPADLeftLocked=false;
+//								return true;
+//							}
+//
+//						}
+//						return false;
+//					}
+//
+//					@Override
+//					public boolean buttonDown(Controller arg0, int arg1) {
+//						if (arg0==null || controller1==null) return false;
+//
+//						controller1.isGamepad();
+//
+//						if (arg0.hashCode()==controller1.hashcode && controller1.mapping!=null) {
+////							Gdx.app.log("opdebug","buttondown:"+arg1);
+//
+////							last_button=arg1;
+//
+//							if (arg1==controller1.mapping.BUTTON_X) {
+//								controller1.BUTTON_X=true;
+//								return true;
+//							}
+//							if (arg1==controller1.mapping.BUTTON_A) {
+//								controller1.BUTTON_A=true;
+//								return true;
+//							}
+//							if (arg1==controller1.mapping.BUTTON_B) {
+//								controller1.BUTTON_B=true;
+//								controller1.backPressed=true;
+//								return true;
+//							}
+//							if (arg1==controller1.mapping.BUTTON_START) { //button_b) {
+//								controller1.BUTTON_SPECIAL2=true;
+//								return true;
+//							}
+//
+//
+//							if (arg1==controller1.mapping.BUTTON_Y) {
+//								controller1.BUTTON_Y=true;
+//								return true;
+//							}
+//							if (arg1==controller1.mapping.BUTTON_LB) {
+//								controller1.BUTTON_LB=true;
+//								return true;
+//							}
+//							if (arg1==controller1.mapping.BUTTON_RB) {
+//								controller1.BUTTON_RB=true;
+//								return true;
+//							}
+//
+//
+//							if (arg1==controller1.mapping.BUTTON_DPAD_UP) {
+//								controller1.upPressed=true;
+//								controller1.BUTTON_DPADUp=true;
+//								return true;
+//							}
+//
+//							if (arg1==controller1.mapping.BUTTON_DPAD_DOWN) {
+//								controller1.downPressed=true;
+//								controller1.BUTTON_DPADDown=true;
+//								return true;
+//							}
+//
+//							if (arg1==controller1.mapping.BUTTON_DPAD_RIGHT) {
+//								controller1.rightPressed=true;
+//								controller1.BUTTON_DPADRight=true;
+//								return true;
+//							}
+//
+//							if (arg1==controller1.mapping.BUTTON_DPAD_LEFT) {
+//								controller1.leftPressed=true;
+//								controller1.BUTTON_DPADLeft=true;
+//								return true;
+//							}
+//
+//						} else if (controller2.mapping!=null){
+////							pl2_last_button=arg1;
+//
+//							if (arg1==controller2.mapping.BUTTON_X) {
+//								controller2.BUTTON_X=true;
+//								return true;
+//							}
+//							if (arg1==controller2.mapping.BUTTON_A) {
+//								controller2.BUTTON_A=true;
+//								return true;
+//							}
+//							if (arg1==controller2.mapping.BUTTON_B) {
+//								controller2.BUTTON_B=true;
+//								controller2.backPressed=true;
+//								return true;
+//							}
+//							if (arg1==controller2.mapping.BUTTON_Y) {
+//								controller2.BUTTON_Y=true;
+//								return true;
+//							}
+//							if (arg1==controller2.mapping.BUTTON_LB) {
+//								controller2.BUTTON_LB=true;
+//								return true;
+//							}
+//							if (arg1==controller2.mapping.BUTTON_RB) {
+//								controller2.BUTTON_RB=true;
+//								return true;
+//							}
+//
+//							if (arg1==controller2.mapping.BUTTON_DPAD_UP) {
+//								controller2.upPressed=true;
+//								controller2.BUTTON_DPADUp=true;
+//								return true;
+//							}
+//
+//							if (arg1==controller2.mapping.BUTTON_DPAD_DOWN) {
+//								controller2.downPressed=true;
+//								controller2.BUTTON_DPADDown=true;
+//								return true;
+//							}
+//
+//							if (arg1==controller2.mapping.BUTTON_DPAD_RIGHT) {
+//								controller2.rightPressed=true;
+//								controller2.BUTTON_DPADRight=true;
+//								return true;
+//							}
+//
+//							if (arg1==controller2.mapping.BUTTON_DPAD_LEFT) {
+//								controller2.leftPressed=true;
+//								controller1.BUTTON_DPADLeft=true;
+//								return true;
+//							}
+//						}
+//
+//						return false;
+//					}
+//
+//					@Override
+//					public boolean axisMoved(Controller arg0, int arg1, float arg2) {
+//						if (arg0==null || controller1==null) return false;
+//
+//
+//
+//						arg2=arg2*128;
+//
+//						if (arg0.hashCode()==controller1.hashcode && controller1.mapping!=null) {
+//
+//							if (arg1==controller1.mapping.AXIS_LX) {
+//								if (arg2>-25 && arg2<25) {
+//									controller1.AXIS_LX=0;
+//								} else {
+//									controller1.AXIS_LX=(int)arg2;
+//									controller1.isGamepad();
+//								}
+//
+//
+//								if (controller1.mapping.reverseXAxis) controller1.AXIS_LX=-controller1.AXIS_LX;
+//								// also handle dpad stuff
+//								if (arg2<-64) controller1.leftPressed=true;
+//								else {
+//									controller1.leftPressed=false;
+//									controller1.leftLocked=false;
+//								}
+//
+//								if (arg2>64) controller1.rightPressed=true;
+//								else {
+//									controller1.rightPressed=false;
+//									controller1.rightLocked=false;
+//								}
+//
+//
+//								return true;
+//
+//							} else if (arg1==controller1.mapping.AXIS_LY) {
+//								if (arg2>-25 && arg2<25) controller1.AXIS_LY=0;
+//								else {
+//									controller1.AXIS_LY=(int)arg2;
+//									controller1.isGamepad();
+//								}
+//
+//								if (controller1.mapping.reverseYAxis) controller1.AXIS_LY=-controller1.AXIS_LY;
+//								if (arg2<-64) controller1.upPressed=true;
+//								else {
+//									controller1.upPressed=false;
+//									controller1.upLocked=false;
+//								}
+//
+//
+//								if (arg2>64) controller1.downPressed=true;
+//								else {
+//									controller1.downPressed=false;
+//									controller1.downLocked=false;
+//								}
+//
+//								return true;
+//							} else if (arg1==controller1.mapping.AXIS_RX) {
+//								if (arg2>-25 && arg2<25) controller1.AXIS_RX=0;
+//								else {
+//									controller1.AXIS_RX=(int)arg2;
+//									controller1.isGamepad();
+//								}
+//								if (controller1.mapping.reverseXAxis) controller1.AXIS_RX=-controller1.AXIS_RX;
+//								return true;
+//
+//							} else if (arg1==controller1.mapping.AXIS_RY) {
+//								if (arg2>-25 && arg2<25) controller1.AXIS_RY=0;
+//								else {
+//									controller1.AXIS_RY=(int)arg2;
+//									controller1.isGamepad();
+//								}
+//
+//								if (controller1.mapping.reverseYAxis) controller1.AXIS_RX=-controller1.AXIS_RX;
+//								return true;
+//							}
+//						} else if (controller2.mapping!=null) {
+//							// controller 2
+//							if (arg1==controller2.mapping.AXIS_LX) {
+//								if (arg2>-25 && arg2<25) controller2.AXIS_LX=0;
+//								else {
+//									controller2.AXIS_LX=(int)arg2;
+//									controller2.isGamepad();
+//								}
+//								if (controller2.mapping.reverseXAxis) controller2.AXIS_LX=-controller2.AXIS_LX;
+//
+//								if (arg2<-64) controller2.leftPressed=true;
+//								else {
+//									controller2.leftPressed=false;
+//									controller2.leftLocked=false;
+//								}
+//
+//								if (arg2>64) controller2.rightPressed=true;
+//								else {
+//									controller2.rightPressed=false;
+//									controller2.rightLocked=false;
+//								}
+//
+//								return true;
+//
+//							} else if (arg1==controller2.mapping.AXIS_LY) {
+//								if (arg2>-25 && arg2<25) controller2.AXIS_LY=0;
+//								else {
+//									controller2.AXIS_LY=(int)arg2;
+//									controller2.isGamepad();
+//								}
+//								if (controller2.mapping.reverseYAxis) controller2.AXIS_LY=-controller2.AXIS_LY;
+//
+//								if (arg2<-64) controller2.upPressed=true;
+//								else {
+//									controller2.upPressed=false;
+//									controller2.upLocked=false;
+//								}
+//
+//								if (arg2>64) controller2.downPressed=true;
+//								else {
+//									controller2.downPressed=false;
+//									controller2.downLocked=false;
+//								}
+//								return true;
+//							} else if (arg1==controller2.mapping.AXIS_RX) {
+//								if (arg2>-25 && arg2<25) controller2.AXIS_RX=0;
+//								else controller2.AXIS_RX=(int)arg2;
+//
+//								if (controller2.mapping.reverseXAxis) controller2.AXIS_RX=-controller2.AXIS_RX;
+//								return true;
+//
+//							} else if (arg1==controller2.mapping.AXIS_RY) {
+//								if (arg2>-25 && arg2<25) controller2.AXIS_RY=0;
+//								else controller2.AXIS_RY=(int)arg2;
+//
+//								if (controller2.mapping.reverseYAxis) controller2.AXIS_RY=-controller2.AXIS_RY;
+//								return true;
+//							}
+//
+//						}
+//						return false;
+//					}
+//
+//				});
+//			}
+//		}
 	}
 	
 	
@@ -1634,8 +1579,8 @@ public class ArcadeCanvas implements ApplicationListener {
 		
         if (fullscreen) {
         	// just use current desktop display width*height so we know it's fullscreen correctly
-        	width=Gdx.app.getGraphics().getDesktopDisplayMode().width;
-        	height=Gdx.app.getGraphics().getDesktopDisplayMode().height;
+        	width=Gdx.app.getGraphics().getWidth();
+        	height=Gdx.app.getGraphics().getHeight();
         }
 
         
@@ -1656,15 +1601,15 @@ public class ArcadeCanvas implements ApplicationListener {
 				currentRatio=(float)current.width/(float)current.height;
 				
 				if (current.width>=width && current.height>=height && currentRatio>=baseRatio) {
-					if (current.refreshRate >= freq && current.bitsPerPixel >= Gdx.app.getGraphics().getDesktopDisplayMode().bitsPerPixel) {
+					if (current.refreshRate >= freq && current.bitsPerPixel >= Gdx.app.getGraphics().getDisplayMode().bitsPerPixel) {
 						targetDisplayMode = current;
 						currentModeID=i;
 						freq = targetDisplayMode.refreshRate;
 					}
 				} else {
 					// find a "best" resolution if we can't find an exact math on ratio/w/h/bbp
-					if ((current.bitsPerPixel == Gdx.app.getGraphics().getDesktopDisplayMode().bitsPerPixel ) &&
-					    (current.refreshRate == Gdx.app.getGraphics().getDesktopDisplayMode().refreshRate )) {
+					if ((current.bitsPerPixel == Gdx.app.getGraphics().getDisplayMode().bitsPerPixel ) &&
+					    (current.refreshRate == Gdx.app.getGraphics().getDisplayMode().refreshRate )) {
 						fallBackMode = current;
 						fallbackModeID=i;
 					}
@@ -1672,14 +1617,13 @@ public class ArcadeCanvas implements ApplicationListener {
 			}
 			
 			if (targetDisplayMode!=null) {
-				Gdx.app.getGraphics().setDisplayMode(targetDisplayMode.width, targetDisplayMode.height,true);
-//				Gdx.app.log("opdebug","displaymode:"+targetDisplayMode.width+"x"+targetDisplayMode.height);
+				Gdx.app.getGraphics().setWindowedMode(targetDisplayMode.width, targetDisplayMode.height);
 			} else if (fallBackMode!=null) {
-				Gdx.app.getGraphics().setDisplayMode(fallBackMode.width, fallBackMode.height,true);
+				Gdx.app.getGraphics().setWindowedMode(fallBackMode.width, fallBackMode.height);
 				currentModeID=fallbackModeID;
 			}
 		} else {
-			Gdx.app.getGraphics().setDisplayMode(width,height, false);
+			Gdx.app.getGraphics().setWindowedMode(width, height);
 		}
 
 		
